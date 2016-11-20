@@ -45,14 +45,14 @@ object SensiblePlugin extends AutoPlugin {
       "-language:postfixOps",
       "-language:implicitConversions",
       "-Xlint",
-      "-Yinline-warnings",
       "-Yno-adapted-args",
       "-Ywarn-dead-code",
       "-Xfuture"
     ) ++ {
         CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, 11 | 12)) => Seq("-Ywarn-unused-import")
-          case _ => Nil
+          case Some((2, 12)) => Seq("-Ywarn-unused-import")
+          case Some((2, 11)) => Seq("-Yinline-warnings", "-Ywarn-unused-import")
+          case Some((2, 10)) => Seq("-Yinline-warnings")
         }
       } ++ {
         // fatal warnings can get in the way during the DEV cycle
