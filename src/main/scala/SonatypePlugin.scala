@@ -14,8 +14,12 @@ import scala.util.matching.Regex
  *
  * If the version string contains "SNAPSHOT", it goes to snapshots,
  * otherwise to staging. Staged releases require a manual login to
- * oss.sonatype.org followed by Repository => Close => (wait for it)
- * => Release
+ * oss.sonatype.org followed by
+ *
+ * 1. Repository
+ * 2. Close
+ * 3. (wait for it)
+ * 4. Release
  *
  * The environment variables `SONATYPE_USERNAME` and
  * `SONATYPE_PASSWORD` will be read for credentials.
