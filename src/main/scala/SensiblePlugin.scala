@@ -70,6 +70,9 @@ object SensiblePlugin extends AutoPlugin {
 
     javaOptions ++= JavaSpecificFlags ++ Seq("-Xss2m", "-Dfile.encoding=UTF8"),
 
+    // must be project-level because of crazy ivy...
+    libraryDependencies ++= testLibs(Test),
+
     dependencyOverrides ++= Set(
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.scala-lang" % "scala-library" % scalaVersion.value,
@@ -78,12 +81,16 @@ object SensiblePlugin extends AutoPlugin {
     ) ++ logback
   ) ++ inConfig(Test)(testSettings) ++ scalariformSettings
 
+  def testLibs(config: Configuration) = Seq(
+    // janino 3.0.6 is not compatible and causes http://www.slf4j.org/codes.html#replay
+    "org.codehaus.janino" % "janino" % "2.7.8" % config,
+    "org.scalatest" %% "scalatest" % "3.0.0" % config
+  ) ++ logback.map(_ % config)
+
   // WORKAROUND https://github.com/sbt/sbt/issues/2534
+  // don't forget to also call testLibs
   def testSettings = Seq(
     parallelExecution := true,
-
-    // must be in Compile because of crazy ivy...
-    libraryDependencies in Compile ++= testLibs(configuration.value),
 
     javaOptions += "-Dlogback.configurationFile=${(baseDirectory in ThisBuild).value}/logback-test.xml",
 
@@ -135,11 +142,5 @@ object SensiblePlugin extends AutoPlugin {
     "org.slf4j" % "jul-to-slf4j" % logbackVersion,
     "org.slf4j" % "jcl-over-slf4j" % logbackVersion
   )
-
-  def testLibs(config: Configuration) = Seq(
-    // janino 3.0.6 is not compatible and causes http://www.slf4j.org/codes.html#replay
-    "org.codehaus.janino" % "janino" % "2.7.8" % config,
-    "org.scalatest" %% "scalatest" % "3.0.0" % config
-  ) ++ logback.map(_ % config)
 
 }
