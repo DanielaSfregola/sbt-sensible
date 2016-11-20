@@ -82,7 +82,8 @@ object SensiblePlugin extends AutoPlugin {
   def testSettings = Seq(
     parallelExecution := true,
 
-    libraryDependencies ++= testLibs(configuration.value),
+    // must be in Compile because of crazy ivy...
+    libraryDependencies in Compile ++= testLibs(configuration.value),
 
     javaOptions += "-Dlogback.configurationFile=${(baseDirectory in ThisBuild).value}/logback-test.xml",
 
@@ -135,7 +136,7 @@ object SensiblePlugin extends AutoPlugin {
     "org.slf4j" % "jcl-over-slf4j" % logbackVersion
   )
 
-  private def testLibs(config: Configuration) = Seq(
+  def testLibs(config: Configuration) = Seq(
     // janino 3.0.6 is not compatible and causes http://www.slf4j.org/codes.html#replay
     "org.codehaus.janino" % "janino" % "2.7.8" % config,
     "org.scalatest" %% "scalatest" % "3.0.0" % config
