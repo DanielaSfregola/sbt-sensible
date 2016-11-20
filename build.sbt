@@ -1,5 +1,4 @@
 organization := "com.fommil"
-version := "1.0.0-SNAPSHOT"
 
 name := "sbt-sensible"
 sbtPlugin := true
