@@ -53,6 +53,7 @@ object SensiblePlugin extends AutoPlugin {
           case Some((2, 12)) => Seq("-Ywarn-unused-import")
           case Some((2, 11)) => Seq("-Yinline-warnings", "-Ywarn-unused-import")
           case Some((2, 10)) => Seq("-Yinline-warnings")
+          case _ => Nil
         }
       } ++ {
         // fatal warnings can get in the way during the DEV cycle
@@ -80,6 +81,10 @@ object SensiblePlugin extends AutoPlugin {
   // WORKAROUND https://github.com/sbt/sbt/issues/2534
   def testSettings = Seq(
     parallelExecution := true,
+
+    libraryDependencies ++= testLibs(configuration.value),
+
+    javaOptions += "-Dlogback.configurationFile=${(baseDirectory in ThisBuild).value}/logback-test.xml",
 
     testForkedParallel := true,
     testGrouping := {
@@ -130,7 +135,7 @@ object SensiblePlugin extends AutoPlugin {
     "org.slf4j" % "jcl-over-slf4j" % logbackVersion
   )
 
-  private def testLibs(config: String = "test") = Seq(
+  private def testLibs(config: Configuration) = Seq(
     // janino 3.0.6 is not compatible and causes http://www.slf4j.org/codes.html#replay
     "org.codehaus.janino" % "janino" % "2.7.8" % config,
     "org.scalatest" %% "scalatest" % "3.0.0" % config
