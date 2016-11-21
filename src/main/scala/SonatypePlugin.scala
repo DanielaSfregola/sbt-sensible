@@ -66,7 +66,8 @@ object SonatypeSupport extends AutoPlugin {
     publishTo := {
       assert(licenses.value.nonEmpty, "licenses cannot be empty or maven central will reject publication")
       val nexus = "https://oss.sonatype.org/"
-      if (isSnapshot.value || version.value.contains("SNAP"))
+      // WORKAROUND https://github.com/dwijnand/sbt-dynver/issues/23
+      if (isSnapshot.value || version.value.contains("+") || version.value.contains("SNAP"))
         Some("snapshots" at nexus + "content/repositories/snapshots")
       else
         Some("releases" at nexus + "service/local/staging/deploy/maven2")
