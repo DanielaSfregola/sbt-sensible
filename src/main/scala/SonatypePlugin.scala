@@ -64,10 +64,11 @@ object SonatypeSupport extends AutoPlugin {
     homepage := Some(url(s"http://github.com/${sonatypeGithub.value._1}/${sonatypeGithub.value._2}")),
     publishTo := {
       assert(licenses.value.nonEmpty, "licenses cannot be empty or maven central will reject publication")
-      val v = version.value
       val nexus = "https://oss.sonatype.org/"
-      if (v.contains("SNAP")) Some("snapshots" at nexus + "content/repositories/snapshots")
-      else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+      if (isSnapshot.value || version.value.contains("SNAP"))
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      else
+        Some("releases" at nexus + "service/local/staging/deploy/maven2")
     },
     credentials ++= {
       for {
