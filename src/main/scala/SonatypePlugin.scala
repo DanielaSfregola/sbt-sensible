@@ -48,6 +48,7 @@ object SonatypeSupport extends AutoPlugin {
   override lazy val projectSettings = Seq(
     PgpKeys.useGpgAgent := true,
     headers := {
+      assert(licenses.value.nonEmpty, "licenses cannot be empty or maven central will reject publication")
       val (org, repo) = sonatypeGithub.value
       val copyrightBlurb = s"// Copyright: 2016 https://github.com/$org/$repo/graphs"
       // doesn't support multiple licenses
