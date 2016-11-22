@@ -24,7 +24,7 @@ object SensiblePlugin extends AutoPlugin {
 
   private val JavaSpecificFlags = sys.props("java.version").substring(0, 3) match {
     case "1.6" | "1.7" => List("-XX:MaxPermSize=256m", "-XX:+UseConcMarkSweepGC")
-    case _ => List("-XX:MaxMetaspaceSize=256m", "-XX:+UseG1GC", "-XX:+UseStringDeduplication")
+    case _             => List("-XX:MaxMetaspaceSize=256m", "-XX:+UseG1GC", "-XX:+UseStringDeduplication")
   }
 
   override val buildSettings = Seq(
@@ -82,7 +82,7 @@ object SensiblePlugin extends AutoPlugin {
           case Some((2, 12)) => Seq("-Ywarn-unused-import")
           case Some((2, 11)) => Seq("-Yinline-warnings", "-Ywarn-unused-import")
           case Some((2, 10)) => Seq("-Yinline-warnings")
-          case _ => Nil
+          case _             => Nil
         }
       } ++ {
         // fatal warnings can get in the way during the DEV cycle
