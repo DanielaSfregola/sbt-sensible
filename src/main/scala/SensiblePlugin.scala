@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicLong
 import scala.util.Properties
 
 import com.typesafe.sbt.SbtScalariform._
+import scalariform.formatter.preferences._
 import sbt._
 import sbt.IO._
 import sbt.Keys._
@@ -15,7 +16,7 @@ import sbt.Keys._
  * A bunch of sensible sbt defaults used by https://github.com/fommil
  */
 object SensiblePlugin extends AutoPlugin {
-  override def requires = plugins.JvmPlugin
+  override def requires = sbtdynver.DynVerPlugin
   override def trigger = allRequirements
 
   private val JavaSpecificFlags = sys.props("java.version").substring(0, 3) match {
@@ -27,6 +28,13 @@ object SensiblePlugin extends AutoPlugin {
     maxErrors := 1,
     fork := true,
     cancelable := true,
+
+    // WORKAROUND https://github.com/dwijnand/sbt-dynver/issues/23
+    version := {
+      val v = version.value
+      if (!v.contains("+")) v
+      else v + "-SNAPSHOT"
+    },
 
     concurrentRestrictions := {
       val limited = Properties.envOrElse("SBT_TASK_LIMIT", "4").toInt
@@ -79,7 +87,10 @@ object SensiblePlugin extends AutoPlugin {
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.scala-lang" % "scalap" % scalaVersion.value
     ) ++ logback
-  ) ++ inConfig(Test)(testSettings) ++ scalariformSettings
+  ) ++ inConfig(Test)(testSettings) ++
+    scalariformSettings ++ Seq(
+      ScalariformKeys.preferences := FormattingPreferences().setPreference(AlignSingleLineCaseStatements, true)
+    )
 
   def testLibs(config: Configuration) = Seq(
     // janino 3.0.6 is not compatible and causes http://www.slf4j.org/codes.html#replay
