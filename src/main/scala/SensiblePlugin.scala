@@ -19,6 +19,9 @@ object SensiblePlugin extends AutoPlugin {
   override def requires = sbtdynver.DynVerPlugin
   override def trigger = allRequirements
 
+  val autoImport = SensibleSettings
+  import autoImport._
+
   private val JavaSpecificFlags = sys.props("java.version").substring(0, 3) match {
     case "1.6" | "1.7" => List("-XX:MaxPermSize=256m", "-XX:+UseConcMarkSweepGC")
     case _ => List("-XX:MaxMetaspaceSize=256m", "-XX:+UseG1GC", "-XX:+UseStringDeduplication")
@@ -42,9 +45,27 @@ object SensiblePlugin extends AutoPlugin {
     }
   )
 
-  override val projectSettings = Seq(
+  override val projectSettings = scalariformSettings ++ Seq(
     ivyLoggingLevel := UpdateLogging.Quiet,
     conflictManager := ConflictManager.strict,
+
+    ScalariformKeys.preferences := FormattingPreferences().setPreference(AlignSingleLineCaseStatements, true),
+
+    resources in Compile ++= {
+      // automatically adds legal information to jars, but are
+      // lower-cased https://github.com/fommil/sbt-sensible/issues/5
+      val orig = (resources in Compile).value
+      val base = baseDirectory.value
+      val root = (baseDirectory in ThisBuild).value
+
+      def fileWithFallback(name: String): Seq[File] = {
+        if ((base / name).exists) Seq(base / name)
+        else if ((root / name).exists) Seq(root / name)
+        else Nil
+      }
+
+      fileWithFallback("LICENSE") ++ fileWithFallback("NOTICE")
+    },
 
     scalacOptions ++= Seq(
       "-encoding", "UTF-8",
@@ -79,7 +100,7 @@ object SensiblePlugin extends AutoPlugin {
     javaOptions ++= JavaSpecificFlags ++ Seq("-Xss2m", "-Dfile.encoding=UTF8"),
 
     // must be project-level because of crazy ivy...
-    libraryDependencies ++= testLibs(Test),
+    libraryDependencies ++= sensibleTestLibs(Test),
 
     dependencyOverrides ++= Set(
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
@@ -87,12 +108,12 @@ object SensiblePlugin extends AutoPlugin {
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.scala-lang" % "scalap" % scalaVersion.value
     ) ++ logback
-  ) ++ inConfig(Test)(testSettings) ++
-    scalariformSettings ++ Seq(
-      ScalariformKeys.preferences := FormattingPreferences().setPreference(AlignSingleLineCaseStatements, true)
-    )
+  ) ++ inConfig(Test)(sensibleTestSettings)
 
-  def testLibs(config: Configuration) = Seq(
+}
+
+object SensibleSettings {
+  def sensibleTestLibs(config: Configuration) = Seq(
     // janino 3.0.6 is not compatible and causes http://www.slf4j.org/codes.html#replay
     "org.codehaus.janino" % "janino" % "2.7.8" % config,
     "org.scalatest" %% "scalatest" % "3.0.1" % config
@@ -100,7 +121,7 @@ object SensiblePlugin extends AutoPlugin {
 
   // WORKAROUND https://github.com/sbt/sbt/issues/2534
   // don't forget to also call testLibs
-  def testSettings = Seq(
+  def sensibleTestSettings = Seq(
     parallelExecution := true,
 
     javaOptions += s"-Dlogback.configurationFile=${(baseDirectory in ThisBuild).value}/logback-test.xml",
@@ -143,15 +164,15 @@ object SensiblePlugin extends AutoPlugin {
     testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),
     testFrameworks := Seq(TestFrameworks.ScalaTest, TestFrameworks.JUnit)
   )
-  // used for unique gclog naming
-  private val forkCount = new AtomicLong()
 
   private val logbackVersion = "1.7.21"
-  private val logback = Seq(
+  private[fommil] val logback = Seq(
     "ch.qos.logback" % "logback-classic" % "1.1.7",
     "org.slf4j" % "slf4j-api" % logbackVersion,
     "org.slf4j" % "jul-to-slf4j" % logbackVersion,
     "org.slf4j" % "jcl-over-slf4j" % logbackVersion
   )
 
+  // used for unique gclog naming
+  private val forkCount = new AtomicLong()
 }
