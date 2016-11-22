@@ -2,11 +2,13 @@
 // License: http://www.apache.org/licenses/LICENSE-2.0
 package fommil
 
-import sbt._
-import Keys._
+import java.util.Calendar
+
+import scala.util.matching.Regex
 
 import com.typesafe.sbt.pgp.PgpKeys
-import scala.util.matching.Regex
+import sbt._
+import sbt.Keys._
 
 /**
  * Zero magic support for publishing to sonatype, assuming the project
@@ -45,12 +47,15 @@ object SonatypeSupport extends AutoPlugin {
     "Header pattern and text by extension; empty by default"
   )
 
+  private val year = Calendar.getInstance.get(Calendar.YEAR)
+
   override lazy val projectSettings = Seq(
     PgpKeys.useGpgAgent := true,
     headers := {
       assert(licenses.value.nonEmpty, "licenses cannot be empty or maven central will reject publication")
       val (org, repo) = sonatypeGithub.value
-      val copyrightBlurb = s"// Copyright: 2016 https://github.com/$org/$repo/graphs"
+      val start = startYear.value.map { y => s"$y - " }.getOrElse("")
+      val copyrightBlurb = s"// Copyright: $start$year https://github.com/$org/$repo/graphs"
       // doesn't support multiple licenses
       val licenseBlurb = licenses.value.map { case (name, url) => s"// License: $url" }.head
       val header = (

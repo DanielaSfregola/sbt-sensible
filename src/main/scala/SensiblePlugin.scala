@@ -92,7 +92,7 @@ object SensiblePlugin extends AutoPlugin {
   def testSettings = Seq(
     parallelExecution := true,
 
-    javaOptions += "-Dlogback.configurationFile=${(baseDirectory in ThisBuild).value}/logback-test.xml",
+    javaOptions += s"-Dlogback.configurationFile=${(baseDirectory in ThisBuild).value}/logback-test.xml",
 
     testForkedParallel := true,
     testGrouping := {
