@@ -31,6 +31,8 @@ object SensiblePlugin extends AutoPlugin {
     maxErrors := 1,
     fork := true,
     cancelable := true,
+    crossPaths := false,
+    sourcesInBase := false,
 
     // WORKAROUND https://github.com/dwijnand/sbt-dynver/issues/23
     version := {
@@ -108,7 +110,7 @@ object SensiblePlugin extends AutoPlugin {
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.scala-lang" % "scalap" % scalaVersion.value
     ) ++ logback
-  ) ++ inConfig(Test)(sensibleTestSettings)
+  ) ++ inConfig(Test)(sensibleTestSettings) ++ inConfig(Compile)(sensibleCrossPath)
 
 }
 
@@ -121,7 +123,7 @@ object SensibleSettings {
 
   // WORKAROUND https://github.com/sbt/sbt/issues/2534
   // don't forget to also call testLibs
-  def sensibleTestSettings = Seq(
+  def sensibleTestSettings = sensibleCrossPath ++ Seq(
     parallelExecution := true,
 
     javaOptions += s"-Dlogback.configurationFile=${(baseDirectory in ThisBuild).value}/logback-test.xml",
@@ -175,4 +177,14 @@ object SensibleSettings {
 
   // used for unique gclog naming
   private val forkCount = new AtomicLong()
+
+  // WORKAROUND https://github.com/sbt/sbt/issues/2819
+  private[fommil] def sensibleCrossPath = Seq(
+    unmanagedSourceDirectories += {
+      val dir = scalaSource.value
+      val Some((major, minor)) = CrossVersion.partialVersion(scalaVersion.value)
+      file(s"${dir.getPath}-$major.$minor")
+    }
+  )
+
 }
