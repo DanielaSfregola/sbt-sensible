@@ -115,6 +115,14 @@ object SensiblePlugin extends AutoPlugin {
 }
 
 object SensibleSettings {
+  def shapeless = Def.setting {
+    val plugins = CrossVersion.partialVersion(scalaVersion.value).collect {
+      case (2, 10) => compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+    }.toList
+
+    "com.chuusai" %% "shapeless" % "2.3.2" :: plugins
+  }
+
   def sensibleTestLibs(config: Configuration) = Seq(
     // janino 3.0.6 is not compatible and causes http://www.slf4j.org/codes.html#replay
     "org.codehaus.janino" % "janino" % "2.7.8" % config,
@@ -126,7 +134,7 @@ object SensibleSettings {
   def sensibleTestSettings = sensibleCrossPath ++ Seq(
     parallelExecution := true,
 
-    javaOptions += s"-Dlogback.configurationFile=${(baseDirectory in ThisBuild).value}/logback-test.xml",
+    javaOptions += s"-Dlogback.configurationFile=${(baseDirectory in ThisBuild).value}/logback-${configuration.value}.xml",
 
     testForkedParallel := true,
     testGrouping := {
@@ -168,7 +176,7 @@ object SensibleSettings {
   )
 
   private val logbackVersion = "1.7.21"
-  private[fommil] val logback = Seq(
+  val logback = Seq(
     "ch.qos.logback" % "logback-classic" % "1.1.7",
     "org.slf4j" % "slf4j-api" % logbackVersion,
     "org.slf4j" % "jul-to-slf4j" % logbackVersion,
