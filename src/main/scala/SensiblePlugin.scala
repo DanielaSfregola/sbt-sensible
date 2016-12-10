@@ -31,7 +31,6 @@ object SensiblePlugin extends AutoPlugin {
     maxErrors := 1,
     fork := true,
     cancelable := true,
-    crossPaths := false,
     sourcesInBase := false,
 
     // WORKAROUND https://github.com/dwijnand/sbt-dynver/issues/23
