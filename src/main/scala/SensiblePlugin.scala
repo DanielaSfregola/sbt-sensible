@@ -174,7 +174,7 @@ object SensibleSettings {
     testFrameworks := Seq(TestFrameworks.ScalaTest, TestFrameworks.JUnit)
   )
 
-  private val logbackVersion = "1.7.21"
+  private val logbackVersion = "1.7.22"
   val logback = Seq(
     "ch.qos.logback" % "logback-classic" % "1.1.8",
     "org.slf4j" % "slf4j-api" % logbackVersion,
