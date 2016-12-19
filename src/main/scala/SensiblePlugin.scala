@@ -170,7 +170,7 @@ object SensibleSettings {
       }
     },
 
-    testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),
+    testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oF", "-W", "120", "60"),
     testFrameworks := Seq(TestFrameworks.ScalaTest, TestFrameworks.JUnit)
   )
 
