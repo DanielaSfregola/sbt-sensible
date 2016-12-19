@@ -170,6 +170,7 @@ object SensibleSettings {
       }
     },
 
+    // and don't forget `export SCALACTIC_FILE_PATHNAMES=true`
     testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oF", "-W", "120", "60"),
     testFrameworks := Seq(TestFrameworks.ScalaTest, TestFrameworks.JUnit)
   )
