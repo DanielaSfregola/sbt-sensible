@@ -138,6 +138,7 @@ object SensibleSettings {
   def sensibleTestSettings = sensibleCrossPath ++ Seq(
     parallelExecution := true,
 
+    javaOptions ~= (_.filterNot(_.startsWith("-Dlogback.configurationFile"))),
     javaOptions += s"-Dlogback.configurationFile=${(baseDirectory in ThisBuild).value}/logback-${configuration.value}.xml",
 
     testForkedParallel := true,
