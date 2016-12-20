@@ -33,6 +33,8 @@ object SensiblePlugin extends AutoPlugin {
     cancelable := true,
     sourcesInBase := false,
 
+    javaOptions += s"-Dsbt.sensible.root=${(baseDirectory in ThisBuild).value.getCanonicalFile}}",
+
     // WORKAROUND https://github.com/dwijnand/sbt-dynver/issues/23
     version := {
       val v = version.value
@@ -49,6 +51,8 @@ object SensiblePlugin extends AutoPlugin {
   override val projectSettings = scalariformSettings ++ Seq(
     ivyLoggingLevel := UpdateLogging.Quiet,
     conflictManager := ConflictManager.strict,
+
+    javaOptions += s"-Dsbt.sensible.name=${name.value}}",
 
     ScalariformKeys.preferences := FormattingPreferences().setPreference(AlignSingleLineCaseStatements, true),
 
