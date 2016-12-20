@@ -53,6 +53,7 @@ object SensiblePlugin extends AutoPlugin {
     conflictManager := ConflictManager.strict,
 
     javaOptions += s"-Dsbt.sensible.name=${name.value}}",
+    javaOptions in Compile += s"-Dlogback.configurationFile=${(baseDirectory in ThisBuild).value}/logback-main.xml",
 
     ScalariformKeys.preferences := FormattingPreferences().setPreference(AlignSingleLineCaseStatements, true),
 
