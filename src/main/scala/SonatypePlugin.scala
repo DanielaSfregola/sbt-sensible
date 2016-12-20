@@ -35,8 +35,8 @@ import sbt.Keys._
  * automatically because it requires Java 7
  * https://github.com/sbt/sbt-header/issues/31 so users must opt-in.
  */
-object SonatypeSupport extends AutoPlugin {
-  override def requires = plugins.JvmPlugin
+object SonatypePlugin extends AutoPlugin {
+  override def requires = xerial.sbt.Sonatype // to override publishTo
   override def trigger = allRequirements
 
   val autoImport = SonatypeKeys
@@ -64,9 +64,7 @@ object SonatypeSupport extends AutoPlugin {
       )
       Map("scala" -> header, "java" -> header)
     },
-    publishMavenStyle := true,
     publishArtifact in Test := false,
-    pomIncludeRepository := { _ => false },
     homepage := Some(url(s"http://github.com/${sonatypeGithub.value._1}/${sonatypeGithub.value._2}")),
     publishTo := {
       assert(licenses.value.nonEmpty, "licenses cannot be empty or maven central will reject publication")
