@@ -1,9 +1,12 @@
 pipeline:
   build:
+    when:
+      branch: master
     image: ensime/ensime:v2.x-cache
     pull: true
     environment:
       - SCALA_VERSION=2.10.6
+      - SBT_VOLATILE_TARGET=/dev/shm
     commands:
       - host `curl -s http://httpbin.org/ip | jq -r '.origin'` || true ;
       - git log | head -n 20 ; git fetch -q --tags

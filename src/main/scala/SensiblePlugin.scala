@@ -52,6 +52,20 @@ object SensiblePlugin extends AutoPlugin {
     ivyLoggingLevel := UpdateLogging.Quiet,
     conflictManager := ConflictManager.strict,
 
+    // makes it really easy to use a RAM disk
+    target := {
+      sys.env.get("SBT_VOLATILE_TARGET") match {
+        case None       => target.value
+        case Some(base) => file(base) / target.value.getCanonicalPath.replace(':', '_')
+      }
+    },
+    javaOptions ++= {
+      sys.env.get("SBT_VOLATILE_TARGET") match {
+        case None       => Nil
+        case Some(base) => s"-Djava.io.tmpdir=${base}/tmp" :: Nil
+      }
+    },
+
     javaOptions += s"-Dsbt.sensible.name=${name.value}}",
     javaOptions in Compile += s"-Dlogback.configurationFile=${(baseDirectory in ThisBuild).value}/logback-main.xml",
 
