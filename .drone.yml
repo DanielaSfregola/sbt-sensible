@@ -5,6 +5,7 @@ pipeline:
     environment:
       - SCALA_VERSION=2.10.6
     commands:
+      - export SBT_VOLATILE_TARGET=$PWD/volatile ;
       - host `curl -s http://httpbin.org/ip | jq -r '.origin'` || true ;
       - git log | head -n 20 ; git fetch -q --tags
       - if $(git grep -qE "TODO|FIXME" *) ; then
