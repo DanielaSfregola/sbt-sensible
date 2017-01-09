@@ -23,8 +23,8 @@ object SensiblePlugin extends AutoPlugin {
   import autoImport._
 
   private val JavaSpecificFlags = sys.props("java.version").substring(0, 3) match {
-    case "1.6" | "1.7" => List("-XX:MaxPermSize=256m", "-XX:+UseConcMarkSweepGC")
-    case _             => List("-XX:MaxMetaspaceSize=256m", "-XX:+UseG1GC", "-XX:+UseStringDeduplication")
+    case "1.6" | "1.7" => List("-XX:MaxPermSize=256m")
+    case _             => List("-XX:MaxMetaspaceSize=256m")
   }
 
   override val buildSettings = Seq(
@@ -33,7 +33,7 @@ object SensiblePlugin extends AutoPlugin {
     cancelable := true,
     sourcesInBase := false,
 
-    javaOptions += s"-Dsbt.sensible.root=${(baseDirectory in ThisBuild).value.getCanonicalFile}}",
+    javaOptions += s"-Dsbt.sensible.root=${(baseDirectory in ThisBuild).value.getCanonicalFile}",
 
     // WORKAROUND https://github.com/dwijnand/sbt-dynver/issues/23
     version := {
@@ -62,11 +62,14 @@ object SensiblePlugin extends AutoPlugin {
     javaOptions ++= {
       sys.env.get("SBT_VOLATILE_TARGET") match {
         case None       => Nil
-        case Some(base) => s"-Djava.io.tmpdir=${base}/tmp" :: Nil
+        case Some(base) =>
+          val tmpdir = s"$base/java.io.tmpdir"
+          file(tmpdir).mkdirs()
+          s"-Djava.io.tmpdir=$tmpdir" :: Nil
       }
     },
 
-    javaOptions += s"-Dsbt.sensible.name=${name.value}}",
+    javaOptions += s"-Dsbt.sensible.name=${name.value}",
     javaOptions in Compile += s"-Dlogback.configurationFile=${(baseDirectory in ThisBuild).value}/logback-main.xml",
 
     ScalariformKeys.preferences := FormattingPreferences().setPreference(AlignSingleLineCaseStatements, true),
