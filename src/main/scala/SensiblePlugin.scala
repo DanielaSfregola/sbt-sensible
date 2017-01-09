@@ -61,7 +61,7 @@ object SensiblePlugin extends AutoPlugin {
     },
     javaOptions ++= {
       sys.env.get("SBT_VOLATILE_TARGET") match {
-        case None       => Nil
+        case None => Nil
         case Some(base) =>
           val tmpdir = s"$base/java.io.tmpdir"
           file(tmpdir).mkdirs()
