@@ -75,11 +75,15 @@ object SonatypePlugin extends AutoPlugin {
         Some("releases" at nexus + "service/local/staging/deploy/maven2")
     },
     credentials ++= {
-      for {
-        username <- sys.env.get("SONATYPE_USERNAME")
-        password <- sys.env.get("SONATYPE_PASSWORD")
-      } yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)
-    }.toSeq,
+      val config = Path.userHome / ".m2" / "credentials"
+      if (config.exists) Seq(Credentials(config))
+      else {
+        for {
+          username <- sys.env.get("SONATYPE_USERNAME")
+          password <- sys.env.get("SONATYPE_PASSWORD")
+        } yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)
+      }.toSeq
+    },
     pomExtra := (
       <scm>
         <url>git@github.com:{ sonatypeGithub.value._1 }/{ sonatypeGithub.value._2 }.git</url>
