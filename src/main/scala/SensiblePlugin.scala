@@ -126,6 +126,12 @@ object SensiblePlugin extends AutoPlugin {
     libraryDependencies ++= sensibleTestLibs(Test),
 
     dependencyOverrides ++= Set(
+      // scala-lang is always used during transitive ivy resolution (and potentially thrown out...)
+      "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+      "org.scala-lang" % "scala-library" % scalaVersion.value,
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      "org.scala-lang" % "scalap" % scalaVersion.value,
+      // user may have a different scala provider...
       scalaOrganization.value % "scala-compiler" % scalaVersion.value,
       scalaOrganization.value % "scala-library" % scalaVersion.value,
       scalaOrganization.value % "scala-reflect" % scalaVersion.value,
