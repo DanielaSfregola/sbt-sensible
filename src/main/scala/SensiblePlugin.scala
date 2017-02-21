@@ -81,13 +81,13 @@ object SensiblePlugin extends AutoPlugin {
       val base = baseDirectory.value
       val root = (baseDirectory in ThisBuild).value
 
-      def fileWithFallback(name: String): Seq[File] = {
-        if ((base / name).exists) Seq(base / name)
-        else if ((root / name).exists) Seq(root / name)
-        else Nil
+      def fileWithFallback(name: String): File = {
+        if ((base / name).exists) base / name
+        else if ((root / name).exists) root / name
+        else throw new IllegalArgumentException(s"legal file $name must exist")
       }
 
-      fileWithFallback("LICENSE") ++ fileWithFallback("NOTICE")
+      Seq(fileWithFallback("LICENSE"), fileWithFallback("NOTICE"))
     },
 
     scalacOptions ++= Seq(
