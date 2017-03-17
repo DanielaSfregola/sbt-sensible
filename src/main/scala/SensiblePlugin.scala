@@ -144,7 +144,7 @@ object SensiblePlugin extends AutoPlugin {
 object SensibleSettings {
   def shapeless = Def.setting {
     val plugins = CrossVersion.partialVersion(scalaVersion.value).collect {
-      case (2, 10) => compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+      case (2, 10) => compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.patch)
     }.toList
 
     "com.chuusai" %% "shapeless" % "2.3.2" :: plugins
